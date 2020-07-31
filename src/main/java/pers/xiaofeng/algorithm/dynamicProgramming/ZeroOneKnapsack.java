@@ -1,9 +1,9 @@
 package pers.xiaofeng.algorithm.dynamicProgramming;
 
 /**
- * @author ：廿柒
- * @description：01背包：每种商品只能买一个
- * @date ：Created in 2020/7/30 15:02
+ * @author: 廿柒
+ * @description: 01背包：每种商品只能买一个
+ * @date: Created in 2020/7/30 15:02
  */
 public class ZeroOneKnapsack {
 

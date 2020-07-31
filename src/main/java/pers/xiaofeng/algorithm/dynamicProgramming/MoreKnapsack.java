@@ -1,9 +1,9 @@
 package pers.xiaofeng.algorithm.dynamicProgramming;
 
 /**
- * @author ：廿柒
- * @description：多重背包:购买次数是有限制的，现用一个num数组规定限制
- * @date ：Created in 2020/7/31 10:34
+ * @author: 廿柒
+ * @description: 多重背包:购买次数是有限制的，现用一个num数组规定限制
+ * @date: Created in 2020/7/31 10:34
  */
 public class MoreKnapsack {
 
