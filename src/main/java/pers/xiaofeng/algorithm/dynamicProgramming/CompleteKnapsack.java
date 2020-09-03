@@ -1,13 +1,13 @@
 package pers.xiaofeng.algorithm.dynamicProgramming;
 
 /**
- * @author ：廿柒
- * @description：完全背包：没有限制时，一种商品可以无限买，直到背包容量装满
+ * @author: 廿柒
+ * @description: 完全背包：没有限制时，一种商品可以无限买，直到背包容量装满
  * 为什么完全背包和01背包很像？
  * 因为01背包在当前商品可以购买时，实际是通过解决自己的i-1的子问题来解决01背包问题，dp[i-1][j - w[i - 1]]，
  * dp[i][j] = Math.max(dp[i - 1][j], dp[i - 1][j - w[i - 1]] + v[i - 1])。
  * 完全背包是自己解决自己的i的子问题，dp[i][j - w[i - 1]]。
- * @date ：Created in 2020/7/31 9:40
+ * @date: Created in 2020/7/31 9:40
  */
 public class CompleteKnapsack {
 
