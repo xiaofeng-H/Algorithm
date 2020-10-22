@@ -88,7 +88,7 @@ public class InsertSort {
         } else
             System.out.println("进行排序的序列为空，请重新输入！！！");
     }
-    
+
     /**
      * 遍历数组且输出数值方法
      *
