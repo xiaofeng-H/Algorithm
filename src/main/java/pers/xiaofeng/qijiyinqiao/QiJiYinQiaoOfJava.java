@@ -108,8 +108,7 @@ public class QiJiYinQiaoOfJava {
 
         // 可以正常编译并且正常运行，因为它只是一个附加注释的标记为http的循环。这会让那些不熟悉标签的人，使得它变得特别有趣！
         int i = 3;
-        http:
-//www.e4developer.com
+        http://www.e4developer.com
         while (i > 0) {
             System.out.println("http://www.e4developer.com");
             i--;
