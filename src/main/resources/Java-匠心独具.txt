@@ -1,0 +1,38 @@
+### 简单记忆线程安全的集合类： **喂！SHE！  **
+
+喂是指：vector；S是指：stack；H是指：hashtable；E是指：Eenumeration
+
+### Collection 是对象集合
+
+Collection 有两个子接口 List 和 Set：
+
+List 可以通过下标 (1,2..) 来取得值，值可以重复,而 Set 只能通过游标来取值，并且值是不能重复的
+
+ArrayList ， Vector ， LinkedList 是 List 的实现类
+
+ArrayList 是线程不安全的， Vector 是线程安全的，这两个类底层都是由数组实现的
+
+LinkedList 是线程不安全的，底层是由链表实现的
+
+### Map 是键值对集合
+
+HashTable 和 HashMap 是 Map 的实现类：
+
+HashTable 是线程安全的，不能存储 null 值
+
+HashMap 不是线程安全的，可以存储 null 值
+
+### MVC
+
+模型(model)它是应用程序的主体部分，主要包括业务逻辑模块（web项目中的Action,dao类）和数据模块（pojo类）。模型与数据格式无关，这样一个模型能为多个视图提供数据。由于应用于模型的代码只需写一次就可以被多个视图重用，所以减少了代码的重复性  
+
+视图(view) 用户与之交互的界面、在web中视图一般由jsp,html组成  
+
+控制器(controller)接收来自界面的请求 并交给模型进行处理 在这个过程中控制器不做任何处理只是起到了一个连接的作用。
+
+
+
+
+
+
+

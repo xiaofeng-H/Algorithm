@@ -1,4 +1,4 @@
-package pers.xiaofeng.test;
+package pers.xiaofeng.daqiaobugong;
 
 /**
  * @description：用户麻将操作类

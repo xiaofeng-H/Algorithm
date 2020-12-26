@@ -1,13 +1,13 @@
-package pers.xiaofeng.test;
+package pers.xiaofeng.algorithm.polymorphism;
 
 /**
  * @description：Java继承练习
  * @author：xiaofeng
  * @date：2020/10/16/11:58
  */
-public class ExtendDemo {
+public class ExtendDemo_0 {
 
-    public static void main (String args[]){
+    public static void main(String args[]) {
         System.out.println("------SubClass 类继承------");
         SubClass sc1 = new SubClass();
         SubClass sc2 = new SubClass(100);
@@ -19,39 +19,43 @@ public class ExtendDemo {
 
 class SuperClass {
     private int n;
-    SuperClass(){
+
+    SuperClass() {
         System.out.println("SuperClass()");
     }
+
     SuperClass(int n) {
         System.out.println("SuperClass(int n)");
         this.n = n;
     }
 }
+
 // SubClass 类继承
-class SubClass extends SuperClass{
+class SubClass extends SuperClass {
     private int n;
 
-    SubClass(){ // 自动调用父类的无参数构造器
+    SubClass() { // 自动调用父类的无参数构造器
         System.out.println("SubClass");
     }
 
-    public SubClass(int n){
+    public SubClass(int n) {
         super(300);  // 调用父类中带有参数的构造器
-        System.out.println("SubClass(int n):"+n);
+        System.out.println("SubClass(int n):" + n);
         this.n = n;
     }
 }
+
 // SubClass2 类继承
-class SubClass2 extends SuperClass{
+class SubClass2 extends SuperClass {
     private int n;
 
-    SubClass2(){
+    SubClass2() {
         super(300);  // 调用父类中带有参数的构造器
         System.out.println("SubClass2");
     }
 
-    public SubClass2(int n){ // 自动调用父类的无参数构造器
-        System.out.println("SubClass2(int n):"+n);
+    public SubClass2(int n) { // 自动调用父类的无参数构造器
+        System.out.println("SubClass2(int n):" + n);
         this.n = n;
     }
 }

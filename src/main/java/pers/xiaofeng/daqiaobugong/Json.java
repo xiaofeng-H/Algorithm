@@ -1,9 +1,6 @@
-package pers.xiaofeng.test;
+package pers.xiaofeng.daqiaobugong;
 
 import com.google.gson.Gson;
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
-import com.google.gson.JsonParser;
 import com.google.gson.reflect.TypeToken;
 
 import java.io.*;
