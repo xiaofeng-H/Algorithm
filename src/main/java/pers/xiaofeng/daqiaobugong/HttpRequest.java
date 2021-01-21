@@ -1,6 +1,11 @@
 package pers.xiaofeng.daqiaobugong;
 
 import com.google.gson.Gson;
+import oracle.jrockit.jfr.VMJFR;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.testng.Reporter;
+import org.testng.annotations.Test;
 
 import java.io.BufferedReader;
 import java.io.DataOutputStream;
@@ -9,8 +14,10 @@ import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.concurrent.*;
 
 /**
  * @description：HTTPS请求工具类（借鉴别人博客）
@@ -19,6 +26,7 @@ import java.util.Map.Entry;
  */
 
 public final class HttpRequest {
+    private static final Logger log = LoggerFactory.getLogger(HttpRequest.class);
     private static Gson gson = new Gson();
 
     // 中传悦众赛事平台接入，悦点商城接入。商户id（2020项目）
@@ -79,11 +87,85 @@ public final class HttpRequest {
         return post(URL, path, param.toString());
     }
 
-    public static void main(String[] args) throws Exception {
-        String path = "/shop/goodslist";
+    @Test
+    public static void main(String[] args) {
+        ExecutorService executorService = Executors.newFixedThreadPool(1);
+        System.out.println("main方法开始运行=====>线程：" + Thread.currentThread().getName());
+
+        // 使用新的线程池进行异步处理
+        CompletableFuture<Boolean> future = CompletableFuture.supplyAsync(() -> {
+            try {
+                System.out.println("正在向HTTP发送请求=====>线程：" + Thread.currentThread().getName());
+                return test1();
+            } catch (Exception e) {
+                System.out.println("请求出现异常了！！！");
+                return null;
+            }
+        }, executorService);
+
+        future.thenAccept((result) -> {
+            System.out.println(result);
+            System.out.println("Http请求结束，开始进行下一步的处理");
+            Reporter.log("Http请求结束，开始进行下一步的处理=====>线程：" + Thread.currentThread().getName());
+            executorService.shutdownNow();
+        });
+
+        try {
+            if (future.get(5000, TimeUnit.MILLISECONDS).equals(true)) {
+                System.out.println("HTTP请求正常处理，可以进行下一步操作=====>线程：" + Thread.currentThread().getName());
+                executorService.shutdownNow();
+            }
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+
+            System.out.println("异步线程处于阻塞状态，收到中断请求！！！=====>线程：" + Thread.currentThread().getName());
+
+        } catch (ExecutionException e) {
+            e.printStackTrace();
+            System.out.println("异步线程出现问题！！！=====>线程：" + Thread.currentThread().getName());
+
+        } catch (TimeoutException e) {
+            e.printStackTrace();
+            System.out.println("异步线程处理超时！！！=====>线程：" + Thread.currentThread().getName());
+
+        }
+
+        System.out.println("main方法运行结束=====>线程：" + Thread.currentThread().getName());
+
+    }
+
+    private static void test2() {
+        System.out.println("我是测试方法2！=====>线程：" + Thread.currentThread().getName());
+    }
+
+    @Test
+    private static boolean test1() {
+        System.out.println("我是测试方法1！start=====>线程：" + Thread.currentThread().getName());
+
+        String path = "/shop/buy";
         String url = URL + path;
-        String result = post(url, path, "");
-        System.out.println("\n" + gson.toJson(result));
+        Map<String, Object> params = new HashMap<>();
+        // 游戏平台中的订单号，唯一
+        String platOrderId = "031cecdb31000000";
+        // 获取用户个人信息
+        String str = "{\"username\":\"张三\",\"userphone\":\"15171507551\",\"useraddress\":{\"proname\": \"湖北\",\"cityname\":\"武汉\",\"areaname\":\"洪山\",\"streetname\":\"关东\",\"address\":\"17楼4号\"}}";
+        UserInformation userInfo = gson.fromJson(str, UserInformation.class);
+        params.put("platorderid", platOrderId);
+        params.put("userid", 656818);
+        params.put("userphone", userInfo.getUserphone());
+        params.put("useraddress", userInfo.getUseraddress());
+        params.put("username", userInfo.getUsername());
+        params.put("goodsid", 232253);
+        params.put("amount", 1);
+        params.put("createtime", new Date().getTime());
+        String string = gson.toJson(params);
+        System.out.println("兑换悦点商城商品发送请求=====>线程：" + Thread.currentThread().getName());
+        String result = HttpRequest.post(url, path, string);
+        System.out.println("兑换悦点商城商品发送返回结果result:" + result);
+
+        System.out.println("我是测试方法1！end=====>线程：" + Thread.currentThread().getName());
+
+        return result != null;
     }
 
     /**
@@ -94,7 +176,7 @@ public final class HttpRequest {
      * @Parameters: param，访问参数。
      * @Return: String，响应数据。
      */
-    public static String post(String URL, String path, String param) throws Exception {
+    public static String post(String URL, String path, String param) {
 
         String timestamp = Long.toString(new Date().getTime());
         String sign_str = PLAT_ID + timestamp + PLAT_KEY + path;
@@ -124,7 +206,7 @@ public final class HttpRequest {
             // 设置该HttpURLConnection实例是否自动执行重定向
             conn.setInstanceFollowRedirects(true);
 
-            /**
+            /*
              * addRequestProperty添加相同的key不会覆盖，如果相同，内容会以{name1,name2}
              * setRequestProperty添加相同的key会覆盖value信息
              * setRequestProperty方法，如果key存在，则覆盖；不存在，直接添加。
@@ -146,6 +228,9 @@ public final class HttpRequest {
             dataOut.writeBytes(param != null ? param : "");
             // 输出完成后刷新并关闭流
             dataOut.flush();
+
+            // 输出连接信息，实际使用时去掉
+//            outConnInfo(conn, url);
 
             // 连接发起请求,处理服务器响应 (从连接获取到输入流并包装为bufferedReader)
             dataIn = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
@@ -178,5 +263,111 @@ public final class HttpRequest {
             }
         }
         return null;
+    }
+
+    /**
+     * 输出连接信息
+     */
+    private static void outConnInfo(HttpURLConnection conn, URL url) throws IOException {
+        // url与url = conn.getURL()是等价的
+        System.out.println("conn.getResponseCode():" + conn.getResponseCode());
+        System.out.println("conn.getURL():" + conn.getURL());
+        System.out.println("conn.getRequestMethod():" + conn.getRequestMethod());
+        System.out.println("conn.getContentType():" + conn.getContentType());
+        System.out.println("conn.getReadTimeout():" + conn.getReadTimeout());
+        System.out.println("conn.getResponseMessage():" + conn.getResponseMessage());
+        System.out.println("url.getDefaultPort():" + url.getDefaultPort());
+        System.out.println("url.getFile():" + url.getFile());
+        System.out.println("url.getHost():" + url.getHost());
+        System.out.println("url.getPath():" + url.getPath());
+        System.out.println("url.getPort():" + url.getPort());
+        System.out.println("url.getProtocol():" + url.getProtocol());
+        System.out.println("url.getQuery():" + url.getQuery());
+        System.out.println("url.getRef():" + url.getRef());
+        System.out.println("url.getUserInfo():" + url.getUserInfo());
+    }
+}
+
+/**
+ * 用户个人信息
+ */
+class UserInformation {
+    private String username;
+    private String userphone;
+    private Address useraddress;
+
+    public String getUsername() {
+        return username;
+    }
+
+    public void setUsername(String username) {
+        this.username = username;
+    }
+
+    public String getUserphone() {
+        return userphone;
+    }
+
+    public void setUserphone(String userphone) {
+        this.userphone = userphone;
+    }
+
+    public Address getUseraddress() {
+        return useraddress;
+    }
+
+    public void setUseraddress(Address useraddress) {
+        this.useraddress = useraddress;
+    }
+}
+
+/**
+ * 用户详细地址
+ */
+class Address {
+    private String proname;
+    private String cityname;
+    private String areaname;
+    private String streetname;
+    private String address;
+
+    public String getProname() {
+        return proname;
+    }
+
+    public void setProname(String proname) {
+        this.proname = proname;
+    }
+
+    public String getCityname() {
+        return cityname;
+    }
+
+    public void setCityname(String cityname) {
+        this.cityname = cityname;
+    }
+
+    public String getAreaname() {
+        return areaname;
+    }
+
+    public void setAreaname(String areaname) {
+        this.areaname = areaname;
+    }
+
+    public String getStreetname() {
+        return streetname;
+    }
+
+    public void setStreetname(String streetname) {
+        this.streetname = streetname;
+    }
+
+    public String getAddress() {
+        return address;
+    }
+
+    public void setAddress(String address) {
+        this.address = address;
     }
 }

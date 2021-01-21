@@ -2,6 +2,7 @@ package pers.xiaofeng.daqiaobugong;
 
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+
 import org.apache.commons.codec.binary.Base64;
 
 /**
@@ -15,7 +16,7 @@ public class HMACSHA256 {
      * @param data 待加密的数据
      * @param key  加密使用的key
      */
-    public static String getSignature(String data, String key) throws Exception {
+    public static String getSignature(String data, String key) {
         try {
             String secret = key;
             String message = data;
