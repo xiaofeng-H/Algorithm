@@ -87,8 +87,12 @@ public final class HttpRequest {
         return post(URL, path, param.toString());
     }
 
+    /**
+     * description: 使用异步线程进行HTTP请求，此时主线程处于阻塞状态，阻塞时间手动确定，超时或其他异常时主线程都会抛出异常然后进行异常处理，以使
+     * 主线程不会一直处于阻塞状态
+     */
     @Test
-    public static void main(String[] args) {
+    public static void demo() {
         ExecutorService executorService = Executors.newFixedThreadPool(1);
         System.out.println("main方法开始运行=====>线程：" + Thread.currentThread().getName());
 
@@ -103,30 +107,50 @@ public final class HttpRequest {
             }
         }, executorService);
 
-        future.thenAccept((result) -> {
-            System.out.println(result);
-            System.out.println("Http请求结束，开始进行下一步的处理");
-            Reporter.log("Http请求结束，开始进行下一步的处理=====>线程：" + Thread.currentThread().getName());
-            executorService.shutdownNow();
-        });
+        try {
+            Thread.sleep(1);
+            System.out.println("线程 " + Thread.currentThread().getName() + " 睡眠已醒，正在杀掉线程 " + executorService.getClass().getName());
+//            executorService.shutdownNow();
+            /**
+             * Thread.currentThread.interrupt() 只对阻塞线程起作用，
+             *
+             * 当线程阻塞时，调用interrupt方法后，该线程会得到一个interrupt异常，可以通过对该异常的处理而退出线程
+             *
+             * 对于正在运行的线程，没有任何作用！
+             */
+//            Thread.currentThread().interrupt();
+        } catch (InterruptedException e) {
+            e.printStackTrace();
+        }
+
+        if (Thread.currentThread().isInterrupted()) {
+            System.out.println("主线程处于阻塞状态，收到中断请求=====>线程：" + Thread.currentThread().getName());
+        }
+
+//        future.thenAccept((result) -> {
+//            System.out.println(result);
+//            System.out.println("Http请求结束，开始进行下一步的处理");
+//            Reporter.log("Http请求结束，开始进行下一步的处理=====>线程：" + Thread.currentThread().getName());
+//            executorService.shutdownNow();
+//        });
 
         try {
-            if (future.get(5000, TimeUnit.MILLISECONDS).equals(true)) {
+            if (future.get(500, TimeUnit.MILLISECONDS).equals(true)) {
                 System.out.println("HTTP请求正常处理，可以进行下一步操作=====>线程：" + Thread.currentThread().getName());
-                executorService.shutdownNow();
+//                executorService.shutdownNow();
             }
         } catch (InterruptedException e) {
             e.printStackTrace();
 
-            System.out.println("异步线程处于阻塞状态，收到中断请求！！！=====>线程：" + Thread.currentThread().getName());
+            System.out.println("主线程处于阻塞状态，收到中断请求！！！=====>线程：" + Thread.currentThread().getName());
 
         } catch (ExecutionException e) {
             e.printStackTrace();
-            System.out.println("异步线程出现问题！！！=====>线程：" + Thread.currentThread().getName());
+            System.out.println("主线程出现问题！！！=====>线程：" + Thread.currentThread().getName());
 
         } catch (TimeoutException e) {
             e.printStackTrace();
-            System.out.println("异步线程处理超时！！！=====>线程：" + Thread.currentThread().getName());
+            System.out.println("主线程处理超时！！！=====>线程：" + Thread.currentThread().getName());
 
         }
 
@@ -135,13 +159,13 @@ public final class HttpRequest {
     }
 
     private static void test2() {
-        System.out.println("我是测试方法2！=====>线程：" + Thread.currentThread().getName());
+        System.out.println("测试方法2！=====>线程：" + Thread.currentThread().getName());
     }
 
     @Test
     private static boolean test1() {
-        System.out.println("我是测试方法1！start=====>线程：" + Thread.currentThread().getName());
-
+        System.out.println("测试方法1！start=====>线程：" + Thread.currentThread().getName());
+        Thread.currentThread().interrupt();
         String path = "/shop/buy";
         String url = URL + path;
         Map<String, Object> params = new HashMap<>();
@@ -159,11 +183,12 @@ public final class HttpRequest {
         params.put("amount", 1);
         params.put("createtime", new Date().getTime());
         String string = gson.toJson(params);
+        System.out.println(params);
         System.out.println("兑换悦点商城商品发送请求=====>线程：" + Thread.currentThread().getName());
         String result = HttpRequest.post(url, path, string);
         System.out.println("兑换悦点商城商品发送返回结果result:" + result);
 
-        System.out.println("我是测试方法1！end=====>线程：" + Thread.currentThread().getName());
+        System.out.println("测试方法1！end=====>线程：" + Thread.currentThread().getName());
 
         return result != null;
     }
@@ -181,6 +206,10 @@ public final class HttpRequest {
         String timestamp = Long.toString(new Date().getTime());
         String sign_str = PLAT_ID + timestamp + PLAT_KEY + path;
         String sign = HMACSHA256.getSignature(sign_str, PLAT_KEY);
+
+        System.out.println(timestamp);
+        System.out.println(sign);
+
 
         HttpURLConnection conn = null;
         // 数据输出流，输出参数信息
