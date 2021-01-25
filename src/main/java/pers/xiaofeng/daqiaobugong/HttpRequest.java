@@ -1,23 +1,24 @@
 package pers.xiaofeng.daqiaobugong;
 
 import com.google.gson.Gson;
+import com.google.gson.reflect.TypeToken;
 import oracle.jrockit.jfr.VMJFR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.testng.Reporter;
 import org.testng.annotations.Test;
 
-import java.io.BufferedReader;
-import java.io.DataOutputStream;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.io.*;
 import java.net.HttpURLConnection;
 import java.net.URL;
+import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
+import java.util.zip.GZIPInputStream;
 
 /**
  * @description：HTTPS请求工具类（借鉴别人博客）
@@ -30,9 +31,9 @@ public final class HttpRequest {
     private static Gson gson = new Gson();
 
     // 中传悦众赛事平台接入，悦点商城接入。商户id（2020项目）
-    public final static String PLAT_ID = "10001";
+    public final static String PLAT_ID = "10015";
     // 中传悦众赛事平台接入，悦点商城接入。生成签名密钥
-    public final static String PLAT_KEY = "ZW71W8XBJ4I3E2LRHLGE4T0MABX3MOXO2RUFTZ5SVMT7ZUKPUEKAA49QQT4KDVPK";
+    public final static String PLAT_KEY = "6BHSKJFWYDVJ81QQZHGNBHWMJAPFBQIKTIGYEHSSXNCSW8P8EXTMFHRRVU0VJCLS";
     // 中传悦众赛事平台接入，悦点商城接入。URL
     public final static String URL = "http://192.168.50.118:8900";
 
@@ -107,21 +108,21 @@ public final class HttpRequest {
             }
         }, executorService);
 
-        try {
-            Thread.sleep(1);
-            System.out.println("线程 " + Thread.currentThread().getName() + " 睡眠已醒，正在杀掉线程 " + executorService.getClass().getName());
-//            executorService.shutdownNow();
-            /**
-             * Thread.currentThread.interrupt() 只对阻塞线程起作用，
-             *
-             * 当线程阻塞时，调用interrupt方法后，该线程会得到一个interrupt异常，可以通过对该异常的处理而退出线程
-             *
-             * 对于正在运行的线程，没有任何作用！
-             */
-//            Thread.currentThread().interrupt();
-        } catch (InterruptedException e) {
-            e.printStackTrace();
-        }
+//        try {
+//            Thread.sleep(1);
+//            System.out.println("线程 " + Thread.currentThread().getName() + " 睡眠已醒，正在杀掉线程 " + executorService.getClass().getName());
+////            executorService.shutdownNow();
+//            /**
+//             * Thread.currentThread.interrupt() 只对阻塞线程起作用，
+//             *
+//             * 当线程阻塞时，调用interrupt方法后，该线程会得到一个interrupt异常，可以通过对该异常的处理而退出线程
+//             *
+//             * 对于正在运行的线程，没有任何作用！
+//             */
+////            Thread.currentThread().interrupt();
+//        } catch (InterruptedException e) {
+//            e.printStackTrace();
+//        }
 
         if (Thread.currentThread().isInterrupted()) {
             System.out.println("主线程处于阻塞状态，收到中断请求=====>线程：" + Thread.currentThread().getName());
@@ -135,7 +136,7 @@ public final class HttpRequest {
 //        });
 
         try {
-            if (future.get(500, TimeUnit.MILLISECONDS).equals(true)) {
+            if (future.get(5000, TimeUnit.MILLISECONDS).equals(true)) {
                 System.out.println("HTTP请求正常处理，可以进行下一步操作=====>线程：" + Thread.currentThread().getName());
 //                executorService.shutdownNow();
             }
@@ -158,8 +159,22 @@ public final class HttpRequest {
 
     }
 
+    @Test
     private static void test2() {
         System.out.println("测试方法2！=====>线程：" + Thread.currentThread().getName());
+        try {
+            // 悦点商城商品信息地址
+            String path = "/shop/goodslist";
+            String url = HttpRequest.URL + path;
+            String param = "";
+
+            String result = HttpRequest.post(url, path, param);
+            System.out.println("悦点商城商品配置加载完毕！");
+            System.out.println(result);
+        } catch (Exception e) {
+            System.out.println("悦点商城商品配置加载失败！！！");
+            e.printStackTrace();
+        }
     }
 
     @Test
@@ -170,21 +185,22 @@ public final class HttpRequest {
         String url = URL + path;
         Map<String, Object> params = new HashMap<>();
         // 游戏平台中的订单号，唯一
-        String platOrderId = "031cecdb31000000";
+        String platOrderId = Long.toString(new Date().getTime());
         // 获取用户个人信息
-        String str = "{\"username\":\"张三\",\"userphone\":\"15171507551\",\"useraddress\":{\"proname\": \"湖北\",\"cityname\":\"武汉\",\"areaname\":\"洪山\",\"streetname\":\"关东\",\"address\":\"17楼4号\"}}";
+        String str = "{\"username\":\"陈李炜\",\"userphone\":\"18040511916\",\"useraddress\":{\"proname\": \"湖北\",\"cityname\":\"武汉\",\"areaname\":\"洪山\",\"streetname\":\"关东\",\"address\":\"17楼4号\"}}";
         UserInformation userInfo = gson.fromJson(str, UserInformation.class);
         params.put("platorderid", platOrderId);
-        params.put("userid", 656818);
+        params.put("userid", 653984);
         params.put("userphone", userInfo.getUserphone());
         params.put("useraddress", userInfo.getUseraddress());
         params.put("username", userInfo.getUsername());
-        params.put("goodsid", 232253);
+        params.put("goodsid", 148759);
         params.put("amount", 1);
         params.put("createtime", new Date().getTime());
         String string = gson.toJson(params);
         System.out.println(params);
         System.out.println("兑换悦点商城商品发送请求=====>线程：" + Thread.currentThread().getName());
+        System.out.println("请求参数：" + string);
         String result = HttpRequest.post(url, path, string);
         System.out.println("兑换悦点商城商品发送返回结果result:" + result);
 
@@ -213,7 +229,7 @@ public final class HttpRequest {
 
         HttpURLConnection conn = null;
         // 数据输出流，输出参数信息
-        DataOutputStream dataOut = null;
+        OutputStream dataOut = null;
         // 数据输入流，处理服务器响应数据
         BufferedReader dataIn = null;
 
@@ -252,17 +268,18 @@ public final class HttpRequest {
             conn.connect();
 
             // 创建输入输出流,用于往连接里面输出携带的参数,(输出内容为?后面的内容)
-            dataOut = new DataOutputStream(conn.getOutputStream());
+            dataOut = conn.getOutputStream();
             // 将参数输出到连接
-            dataOut.writeBytes(param != null ? param : "");
+            dataOut.write(param != null ? param.getBytes(StandardCharsets.UTF_8) : "".getBytes(StandardCharsets.UTF_8));
             // 输出完成后刷新并关闭流
             dataOut.flush();
+            dataOut.close();
 
             // 输出连接信息，实际使用时去掉
 //            outConnInfo(conn, url);
 
             // 连接发起请求,处理服务器响应 (从连接获取到输入流并包装为bufferedReader)
-            dataIn = new BufferedReader(new InputStreamReader(conn.getInputStream(), "UTF-8"));
+            dataIn = new BufferedReader(new InputStreamReader(conn.getInputStream(),"utf-8"));
             String line;
             // 用来存储响应数据
             StringBuilder sb = new StringBuilder();
