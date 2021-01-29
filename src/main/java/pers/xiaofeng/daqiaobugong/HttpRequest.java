@@ -188,13 +188,14 @@ public final class HttpRequest {
         String platOrderId = Long.toString(new Date().getTime());
         // 获取用户个人信息
         String str = "{\"username\":\"陈李炜\",\"userphone\":\"18040511916\",\"useraddress\":{\"proname\": \"湖北\",\"cityname\":\"武汉\",\"areaname\":\"洪山\",\"streetname\":\"关东\",\"address\":\"17楼4号\"}}";
+//        String string = new String(str,"UTF-8");
         UserInformation userInfo = gson.fromJson(str, UserInformation.class);
         params.put("platorderid", platOrderId);
-        params.put("userid", 653984);
+        params.put("userid", 414227);
         params.put("userphone", userInfo.getUserphone());
         params.put("useraddress", userInfo.getUseraddress());
         params.put("username", userInfo.getUsername());
-        params.put("goodsid", 148759);
+        params.put("goodsid", 227219);
         params.put("amount", 1);
         params.put("createtime", new Date().getTime());
         String string = gson.toJson(params);
@@ -239,7 +240,7 @@ public final class HttpRequest {
             // 将url以open方法返回的urlConnection连接强转为HttpURLConnection连接(标识一个url所引用的远程对象连接)
             // 此时cnnection只是为一个连接对象,待连接中
             conn = (HttpURLConnection) url.openConnection();
-
+            conn.setRequestProperty("Charset", "UTF-8");
             // 设置连接输出流为true,默认false (post请求是以流的方式隐式的传递参数)
             conn.setDoOutput(true);
             // 设置连接输入流为true
@@ -271,12 +272,13 @@ public final class HttpRequest {
             dataOut = conn.getOutputStream();
             // 将参数输出到连接
             dataOut.write(param != null ? param.getBytes(StandardCharsets.UTF_8) : "".getBytes(StandardCharsets.UTF_8));
+
             // 输出完成后刷新并关闭流
             dataOut.flush();
             dataOut.close();
 
             // 输出连接信息，实际使用时去掉
-//            outConnInfo(conn, url);
+            outConnInfo(conn, url);
 
             // 连接发起请求,处理服务器响应 (从连接获取到输入流并包装为bufferedReader)
             dataIn = new BufferedReader(new InputStreamReader(conn.getInputStream(),"utf-8"));
