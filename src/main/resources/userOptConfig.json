@@ -1,0 +1,98 @@
+[
+  {
+    "description": "明杠",
+    "deskId": 1,
+    "gameId": 3,
+    "opt": 203,
+    "parameter": 0,
+    "module": 1
+  },
+  {
+    "description": "暗杠",
+    "deskId": 1,
+    "gameId": 3,
+    "opt": 204,
+    "parameter": 0,
+    "module": 1
+  },
+  {
+    "description": "补杠",
+    "deskId": 1,
+    "gameId": 3,
+    "opt": 205,
+    "parameter": 0,
+    "module": 1
+  },
+  {
+    "description": "自摸",
+    "deskId": 1,
+    "gameId": 3,
+    "opt": 206,
+    "parameter": 1,
+    "module": 2
+  },
+  {
+    "description": "明杠",
+    "deskId": 1,
+    "gameId": 4,
+    "opt": 203,
+    "parameter": 0,
+    "module": 1
+  },
+  {
+    "description": "暗杠",
+    "deskId": 1,
+    "gameId": 4,
+    "opt": 204,
+    "parameter": 0,
+    "module": 1
+  },
+  {
+    "description": "补杠",
+    "deskId": 1,
+    "gameId": 4,
+    "opt": 205,
+    "parameter": 0,
+    "module": 1
+  },
+  {
+    "description": "自摸",
+    "deskId": 1,
+    "gameId": 4,
+    "opt": 206,
+    "parameter": 1,
+    "module": 2
+  },
+  {
+    "description": "明杠",
+    "deskId": 1,
+    "gameId": 71,
+    "opt": 203,
+    "parameter": 0,
+    "module": 1
+  },
+  {
+    "description": "暗杠",
+    "deskId": 1,
+    "gameId": 71,
+    "opt": 204,
+    "parameter": 0,
+    "module": 1
+  },
+  {
+    "description": "补杠",
+    "deskId": 1,
+    "gameId": 71,
+    "opt": 205,
+    "parameter": 0,
+    "module": 1
+  },
+  {
+    "description": "自摸",
+    "deskId": 1,
+    "gameId": 71,
+    "opt": 206,
+    "parameter": 1,
+    "module": 2
+  }
+]
