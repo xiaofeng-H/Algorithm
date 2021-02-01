@@ -1,5 +1,0 @@
-{
-    "name": "xiaofeng",
-	"age": 21,
-	"sex": 1
-}
