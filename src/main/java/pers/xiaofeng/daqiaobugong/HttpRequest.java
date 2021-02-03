@@ -1,11 +1,8 @@
 package pers.xiaofeng.daqiaobugong;
 
 import com.google.gson.Gson;
-import com.google.gson.reflect.TypeToken;
-import oracle.jrockit.jfr.VMJFR;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.testng.Reporter;
 import org.testng.annotations.Test;
 
 import java.io.*;
@@ -14,11 +11,9 @@ import java.net.URL;
 import java.nio.charset.StandardCharsets;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
 import java.util.concurrent.*;
-import java.util.zip.GZIPInputStream;
 
 /**
  * @description：HTTPS请求工具类（借鉴别人博客）
