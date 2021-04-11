@@ -16,6 +16,16 @@ public class Son extends Father {
         this.age = age;
     }
 
+    public Son() {
+
+    }
+
+    @Override
+    public synchronized void demo1() {
+        System.out.println("Son demo1...the thread is : " + Thread.currentThread().getName());
+        super.demo1();
+    }
+
     public String getName() {
         return name;
     }

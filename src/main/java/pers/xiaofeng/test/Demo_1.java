@@ -3,7 +3,6 @@ package pers.xiaofeng.test;
 import com.google.gson.Gson;
 import org.testng.annotations.Test;
 
-import javax.jws.soap.SOAPBinding;
 import java.io.*;
 
 /**
