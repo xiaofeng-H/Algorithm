@@ -1,5 +1,6 @@
 package pers.xiaofeng.algorithm.freighting;
 
+import com.google.gson.Gson;
 import pers.xiaofeng.algorithm.genetic.Chromosome;
 
 import java.lang.reflect.Array;
@@ -15,6 +16,7 @@ import java.util.List;
  * @create: 2021-04-09 22:09
  */
 public class SolutionOfFreighting {
+    private static final Gson gson = new Gson();
 
     // 集合N{1, 2, …, i, …, n}为到站相同的零散货物的集合
     private int N;
@@ -43,9 +45,6 @@ public class SolutionOfFreighting {
     // 集合Q（Q是N的子集）为指令性优先配装货物集合
     private int[] Q;
 
-    // xij（i∈N，j∈M）为配装货物决策变量，xij=1，表示货物i装入j，xij=0，表示货物i不装入j
-    private int[] x;
-
     // S[i]=j 表示第i号货物装在了第j号货车
     private int[] S;
 
@@ -63,10 +62,10 @@ public class SolutionOfFreighting {
     }
 
     public static void main(String[] args) {
-        double[] g = {1.221, 1.156, 0.7, 1.243, 1.600};
-        double[] v = {1.05, 1.98, 2.00, 3.14, 2.86};
-        double[] G = {2, 3, 2};
-        double[] V = {2, 3, 2};
+        double[] g = {1.221, 1.156, 0.7, 1.243, 1.600, 1.612, 2.300, 1.930, 1.850, 1.900};
+        double[] v = {1.05, 1.98, 2.00, 3.14, 2.86, 2.17, 4.80, 5.20, 2.30, 3.80};
+        double[] G = {5, 10, 15, 20};
+        double[] V = {5, 10, 15, 20};
         SolutionOfFreighting solutionOfFreighting = new SolutionOfFreighting(g, v, G, V);
         solutionOfFreighting.calculate();
     }
@@ -81,6 +80,10 @@ public class SolutionOfFreighting {
         this.sumOfVolume = new double[M];
         this.s = new double[N];
         this.S = new int[N];
+
+        // 数据初始化
+        initArray(s);
+        initArray(S);
 
         // 若将所有货物都配装，则所需车辆为nm
         int nm = 0;
@@ -123,8 +126,12 @@ public class SolutionOfFreighting {
             }
         }
 
+        System.out.println("排序前的容重比：" + gson.toJson(s));
         // 对w进行递减排序得到排序后的货物对应的原始位置
         int[] b1 = bubbleSort(s, false);
+        System.out.println("排序前的容重比：" + gson.toJson(s));
+
+        System.out.println("排序后的货物位置为：" + gson.toJson(b1));
 
         // 临时记录b1的List，只因List操作更方便
         List<Integer> listTmp = new ArrayList<>();
@@ -140,35 +147,37 @@ public class SolutionOfFreighting {
             for (int i = 0; i < listTmp.size(); i++) {
                 b[i] = listTmp.get(i);
             }
-
+            System.out.println("待装货物为：" + gson.toJson(b));
 
             for (int i = 0; i < b.length; i++) {   // i表示是哪个货物
                 if (i % 2 == 0) {
-                    if ((sumOfWeight[j] + g[b[i]]) <= G[j] && (sumOfVolume[j] + v[b[i]]) <= V[j]) {
+                    if ((sumOfWeight[j] + g[b[i / 2]]) <= G[j] && (sumOfVolume[j] + v[b[i / 2]]) <= V[j]) {
+                        System.out.println("正在装" + b[i / 2] + "号货物");
                         // 将i号货物的重量和体积累加到j号货车
-                        sumOfWeight[j] += g[b[i]];
-                        sumOfVolume[j] += v[b[i]];
+                        sumOfWeight[j] += g[b[i / 2]];
+                        sumOfVolume[j] += v[b[i / 2]];
                         // 表示第i号货物装入到j货车
-                        S[i] = j;
+                        S[b[i / 2]] = j;
                         // 在当前还未装载的货物中移除第i号货物
-                        listTmp.remove(i);
+                        listTmp.remove(0);
                     }
                 } else {
-                    if ((sumOfWeight[j] + g[b[b.length - 1 - i]]) <= G[j] && (sumOfVolume[j] + v[b[b.length - 1 - i]]) <= V[j]) {
+                    if ((sumOfWeight[j] + g[b[b.length - 1 - (i / 2)]]) <= G[j] && (sumOfVolume[j] + v[b[b.length - 1 - (i / 2)]] <= V[j])) {
+                        System.out.println("正在装" + b[b.length - 1 - (i / 2)] + "号货物");
                         // 将b.length - 1 - i号货物的重量和体积累加到j号货车
-                        sumOfWeight[j] += g[b[b.length - 1 - i]];
-                        sumOfVolume[j] += v[b[b.length - 1 - i]];
-                        // 表示第b.length - 1 - i号货物装入到j货车
-                        S[N - 1 - i] = j;
+                        sumOfWeight[j] += g[b[b.length - 1 - (i / 2)]];
+                        sumOfVolume[j] += v[b[b.length - 1 - (i / 2)]];
+                        // 表示第b.length - 1 - (i / 2)号货物装入到j货车
+                        S[b[b.length - 1 - (i / 2)]] = j;
                         // 在当前还未装载的货物中移除第N - 1 - i号货物
-                        listTmp.remove(b.length - 1 - i);
+                        listTmp.remove(listTmp.size() - 1);
                     }
                 }
 
-                // 表示第j号车已经装满，开始装下一辆车
+                /*// 表示第j号车已经装满，开始装下一辆车
                 if (sumOfWeight[j] > G[j] || sumOfVolume[j] > V[j]) {
                     break;
-                }
+                }*/
             }
             // 所需车辆数+1
             nm += 1;
@@ -179,8 +188,8 @@ public class SolutionOfFreighting {
         // 所有货车装载的货物体积总和
         double volumeSumOfLorry = sumOfArrays(sumOfVolume);
 
-        System.out.println("货物累计重量为：" + weightSumOfGoods + " \t| 货车已装载的累计重量为：" + weightSumOfLorry);
-        System.out.println("货物累计体积为：" + volumeSumOfGoods + " \t| 货车已装载的累计体积为：" + volumeSumOfLorry);
+        System.out.println("货物累计重量为：" + weightSumOfGoods + " | 货车已装载的累计重量为：" + weightSumOfLorry);
+        System.out.println("货物累计体积为：" + volumeSumOfGoods + " | 货车已装载的累计体积为：" + volumeSumOfLorry);
 
 
     }
@@ -190,25 +199,19 @@ public class SolutionOfFreighting {
      */
     private void print() {
         System.out.println("====================Again and again====================");
-        System.out.println("待装货物的重量和体积如下：");
+        System.out.println("\n===>待装货物的重量和体积如下：");
         for (int i = 0; i < g.length; i++) {
             System.out.println("货物编号：" + i + "\t货物重量：" + g[i] + "\t货物体积：" + v[i]);
         }
 
-        System.out.println("货车可装货物的重量如下：");
+        System.out.println("\n===>货车承载量和已装载货物信息如下：");
         for (int i = 0; i < G.length; i++) {
-            System.out.println("货车编号：" + i + "\t货车载重量：" + G[i] + "\t货车已装重量" + sumOfWeight[i]);
+            System.out.printf("货车编号：%d \t货车载重量：%6.3f \t货车容量：%6.3f \t货车已装重量：%6.3f \t货车已装容量：%6.3f\n",
+                    i, G[i], V[i], sumOfWeight[i], sumOfVolume[i]);
         }
 
-        System.out.println("货车可装货物的体积如下：");
-        for (int i = 0; i < V.length; i++) {
-            System.out.println("货车编号：" + i + "\t货车容量：" + V[i] + "\t货车已装容量" + sumOfVolume[i]);
-        }
-
-        System.out.println("配装结果如下：");
-        for (int i = 0; i < S.length; i++) {
-            System.out.println(i + "号货物装在了" + S[i] + "号货车");
-        }
+        System.out.println("\n===>配装结果如下：");
+        System.out.println(gson.toJson(S));
 
     }
 
@@ -226,6 +229,13 @@ public class SolutionOfFreighting {
         return sum;
     }
 
+    private void initArray(int[] array) {
+        Arrays.fill(array, -1);
+    }
+
+    private void initArray(double[] array) {
+        Arrays.fill(array, -1);
+    }
 
     /**
      * 起泡排序
@@ -237,6 +247,10 @@ public class SolutionOfFreighting {
     private int[] bubbleSort(double[] r, boolean isIncrease) {
         // 用来记录按照容重比排序后该货物原先的位置
         int[] b1 = new int[r.length];
+        // 先对其进行赋值操作，不然如果该位置的值不变的话会让其默认为0
+        for (int i = 0; i < b1.length; i++) {
+            b1[i] = i;
+        }
 
         // 变量flag用来标记本趟排序是否发生了交换
         byte flag;
@@ -244,18 +258,20 @@ public class SolutionOfFreighting {
             flag = 0;
             for (int j = 1; j <= i; ++j) {
                 // 临时变量
-                double temp = 0;
+                double temp1 = 0;
+                int temp2 = 0;
                 // 递增排序
                 if (isIncrease) {
                     if (r[j - 1] > r[j]) {
                         // 记录排序之后的值
-                        temp = r[j];
+                        temp1 = r[j];
                         r[j] = r[j - 1];
-                        r[j - 1] = temp;
+                        r[j - 1] = temp1;
 
                         // 记录原始位置
-                        b1[j] = j - 1;
-                        b1[j - 1] = j;
+                        temp2 = b1[j];
+                        b1[j] = b1[j - 1];
+                        b1[j - 1] = temp2;
 
                         flag = 1;
                     }
@@ -263,13 +279,14 @@ public class SolutionOfFreighting {
                     // 递减排序
                     if (r[j - 1] < r[j]) {
                         // 记录排序之后的值
-                        temp = r[j];
+                        temp1 = r[j];
                         r[j] = r[j - 1];
-                        r[j - 1] = temp;
+                        r[j - 1] = temp1;
 
                         // 记录原始位置
-                        b1[j] = j - 1;
-                        b1[j - 1] = j;
+                        temp2 = b1[j];
+                        b1[j] = b1[j - 1];
+                        b1[j - 1] = temp2;
 
                         flag = 1;
                     }
