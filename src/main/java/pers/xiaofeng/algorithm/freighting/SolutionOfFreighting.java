@@ -60,6 +60,10 @@ public class SolutionOfFreighting {
     // 所需货车数量
     private int needLorryCounts;
 
+    // 货车的装载量
+    private double sumWeightOfLorries;
+    private double sumVolumeOfLorries;
+
     // 货车已装载的重量和容量
     private double[] sumOfVolume;
     private double[] sumOfWeight;
@@ -89,11 +93,11 @@ public class SolutionOfFreighting {
     }
 
     private void initData() {
-        this.sumOfWeight = new double[countsOfLorry];
-        this.sumOfVolume = new double[countsOfLorry];
-        this.weightToVolume = new double[countsOfGoods];
-        this.solution = new int[countsOfGoods];
-        this.needLorryCounts = 0;
+        sumOfWeight = new double[countsOfLorry];
+        sumOfVolume = new double[countsOfLorry];
+        weightToVolume = new double[countsOfGoods];
+        solution = new int[countsOfGoods];
+        needLorryCounts = 0;
 
         // 数据初始化
         initArray(weightToVolume);
@@ -220,7 +224,20 @@ public class SolutionOfFreighting {
      * 计算种群适应度
      */
     private void calculateFitness() {
-        
+        // 计算货车的载重量和
+        sumWeightOfLorries = sumOfArrays(weightOfLorry);
+        sumVolumeOfLorries = sumOfArrays(volumeOfLorry);
+
+        // 计算f1
+        for (int i = 0; i < countsOfGoods; i++) {
+            for (int j = 0; j < countsOfLorry; j++) {
+
+            }
+        }
+
+        // 计算f2
+
+        // 计算种群适应度
     }
 
     /**
