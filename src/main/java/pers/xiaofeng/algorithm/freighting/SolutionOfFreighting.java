@@ -79,10 +79,15 @@ public class SolutionOfFreighting {
     }
 
     public static void main(String[] args) {
-        double[] g = {1.221, 1.156, 0.7, 1.243, 1.600, 1.612, 2.300, 1.930, 1.850, 1.900};
-        double[] v = {1.05, 1.98, 2.00, 3.14, 2.86, 2.17, 4.80, 5.20, 2.30, 3.80};
-        double[] G = {5, 10, 15, 20};
-        double[] V = {5, 10, 15, 20};
+        double[] g = {1.221, 1.156, 0.7, 1.243, 1.600, 1.612, 2.300, 1.930, 1.850, 1.900, 1.120, 1.431, 0.600, 0.30, 1.040,
+                0.805, 1.220, 1.1000, 1.782, 1.100, 1.030, 0.730, 1.030, 2.430, 1.520, 1.890, 1.320, 1.150, 1.102, 2.041,
+                1.900, 2.400, 1.029, 3.000, 1.840, 1.796, 2.650, 1.975, 0.800, 1.100, 1.200, 2.000};
+        double[] v = {1.05, 1.98, 2.00, 3.14, 2.86, 2.17, 4.80, 5.20, 2.30, 3.80, 2.00, 4.02, 2.78, 3.22, 2.60, 1.23, 0.65,
+                2.40, 0.87, 1.54, 5.60, 4.40, 1.80, 3.80, 4.00, 5.46, 3.54, 1.60, 2.46, 2.20, 2.80, 3.20, 3.00, 1.20, 1.20,
+                3.89, 1.01, 1.23, 1.00, 3.20, 0.80, 1.10,};
+        System.out.println(g.length + "|" + v.length);
+        double[] G = {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6};
+        double[] V = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10};
         SolutionOfFreighting solutionOfFreighting = new SolutionOfFreighting(g, v, G, V);
         solutionOfFreighting.calculate();
     }
@@ -247,12 +252,12 @@ public class SolutionOfFreighting {
         System.out.println("====================Again and again====================");
         System.out.println("\n===>待装货物的重量和体积如下：");
         for (int i = 0; i < weightOfGoods.length; i++) {
-            System.out.printf("货物编号：%d \t货物重量：%5.3f \t货物体积：%5.3f\n", i, weightOfGoods[i], volumeOfGoods[i]);
+            System.out.printf("货物编号：%2d \t货物重量：%5.3f \t货物体积：%5.3f\n", i, weightOfGoods[i], volumeOfGoods[i]);
         }
 
         System.out.println("\n===>货车承载量和已装载货物信息如下：");
         for (int i = 0; i < weightOfLorry.length; i++) {
-            System.out.printf("货车编号：%d \t货车载重量：%6.3f \t货车容量：%6.3f \t货车已装重量：%6.3f \t货车已装容量：%6.3f\n",
+            System.out.printf("货车编号：%2d \t货车载重量：%6.3f \t货车容量：%6.3f \t货车已装重量：%6.3f \t货车已装容量：%6.3f\n",
                     i, weightOfLorry[i], volumeOfLorry[i], sumOfWeight[i], sumOfVolume[i]);
         }
 
