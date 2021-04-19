@@ -85,9 +85,9 @@ public class SolutionOfFreighting {
         double[] v = {1.05, 1.98, 2.00, 3.14, 2.86, 2.17, 4.80, 5.20, 2.30, 3.80, 2.00, 4.02, 2.78, 3.22, 2.60, 1.23, 0.65,
                 2.40, 0.87, 1.54, 5.60, 4.40, 1.80, 3.80, 4.00, 5.46, 3.54, 1.60, 2.46, 2.20, 2.80, 3.20, 3.00, 1.20, 1.20,
                 3.89, 1.01, 1.23, 1.00, 3.20, 0.80, 1.10,};
-        System.out.println(g.length + "|" + v.length);
-        double[] G = {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6};
-        double[] V = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10};
+        //System.out.println(g.length + "|" + v.length);
+        double[] G = {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6};
+        double[] V = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10};
         SolutionOfFreighting solutionOfFreighting = new SolutionOfFreighting(g, v, G, V);
         solutionOfFreighting.calculate();
     }
@@ -125,19 +125,14 @@ public class SolutionOfFreighting {
             if (i == countsOfLorry - 1) {
                 break;
             }
-            if (weightOfGoods[i] < weightOfGoods[i + 1]) {
-                minOfWeight = weightOfGoods[i];
-            }
-
-            if (volumeOfLorry[i] < volumeOfLorry[i + 1]) {
-                minOfVolume = volumeOfLorry[i];
-            }
+            minOfWeight = Math.min(weightOfLorry[i], weightOfLorry[i + 1]);
+            minOfVolume = Math.min(volumeOfLorry[i], volumeOfLorry[i + 1]);
         }
 
         // 向上取整
         ng = (int) Math.ceil(weightSumOfGoods / minOfWeight);
         nv = (int) Math.ceil(volumeSumOfGoods / minOfVolume);
-        //nm = Math.max(ng, nv);
+        System.out.println("初步估算，大概需要 <" + Math.max(ng, nv) + "> 辆货车");
 
         // 初始化零散货物的密度/反密度
         for (int i = 0; i < countsOfGoods; i++) {
@@ -153,7 +148,7 @@ public class SolutionOfFreighting {
         int[] b1 = bubbleSort(weightToVolume, false);
         System.out.println("排序前的容重比：" + gson.toJson(weightToVolume));
 
-        System.out.println("排序后的货物位置为：" + gson.toJson(b1));
+        System.out.println("排序后的货物位置为：" + gson.toJson(b1) + "\n");
 
         // 临时记录b1的List，只因List操作更方便
         List<Integer> listTmp = new ArrayList<>();
@@ -164,20 +159,41 @@ public class SolutionOfFreighting {
 
         // 假设现有的所有货车可以装下所有的货物
         for (int j = 0; j < countsOfLorry; j++) {   // j表示货车的次序
+
+            // 记录当前车辆已经配装了几件货物
+            int count = 0;
+
             // b表示当前还未装载的货物
             int[] b = new int[listTmp.size()];
             for (int i = 0; i < listTmp.size(); i++) {
                 b[i] = listTmp.get(i);
             }
-            System.out.println("待装货物为：" + gson.toJson(b));
-
             // 如果货物已经装完，则直接退出循环
             if (b.length == 0) {
+                System.out.println("货物已全部装完！！！\n");
                 break;
             }
+            System.out.println("待装货物为：" + gson.toJson(b));
 
             for (int i = 0; i < b.length; i++) {   // i表示是哪个货物
-                if (i % 2 == 0) {
+
+                if ((sumOfWeight[j] + weightOfGoods[b[i]]) <= weightOfLorry[j] && (sumOfVolume[j] + volumeOfGoods[b[i]]) <= volumeOfLorry[j]) {
+                    System.out.println("正在装" + b[i] + "号货物");
+                    // 将i号货物的重量和体积累加到j号货车
+                    sumOfWeight[j] += weightOfGoods[b[i]];
+                    sumOfVolume[j] += volumeOfGoods[b[i]];
+                    // 表示第i号货物装入到j货车
+                    solution[b[i]] = j;
+                    // 记录数组x x[i][j] = 1 表示i号货物装入j号车
+                    x[b[i]][j] = 1;
+                    // 在当前还未装载的货物中移除第i号货物
+                    listTmp.remove(i - count);
+                    // 记录已经配装货物的数量，因为删除货物是下标问题
+                    ++count;
+                }
+
+
+                /*if (i % 2 == 0) {
                     if ((sumOfWeight[j] + weightOfGoods[b[i / 2]]) <= weightOfLorry[j] && (sumOfVolume[j] + volumeOfGoods[b[i / 2]]) <= volumeOfLorry[j]) {
                         System.out.println("正在装" + b[i / 2] + "号货物");
                         // 将i号货物的重量和体积累加到j号货车
@@ -203,7 +219,7 @@ public class SolutionOfFreighting {
                         // 在当前还未装载的货物中移除第N - 1 - i号货物
                         listTmp.remove(listTmp.size() - 1);
                     }
-                }
+                }*/
 
                 /*// 表示第j号车已经装满，开始装下一辆车
                 if (sumOfWeight[j] > G[j] || sumOfVolume[j] > V[j]) {
@@ -219,8 +235,8 @@ public class SolutionOfFreighting {
         // 所有货车装载的货物体积总和
         double volumeSumOfLorry = sumOfArrays(sumOfVolume);
 
-        System.out.println("货物累计重量为：" + weightSumOfGoods + " | 货车已装载的累计重量为：" + weightSumOfLorry);
-        System.out.println("货物累计体积为：" + volumeSumOfGoods + " | 货车已装载的累计体积为：" + volumeSumOfLorry);
+        System.out.println("货物累计重量为：" + weightSumOfGoods + " \t| 货车已装载的累计重量为：" + weightSumOfLorry);
+        System.out.println("货物累计体积为：" + volumeSumOfGoods + " \t| 货车已装载的累计体积为：" + volumeSumOfLorry + "\n");
 
 
     }
@@ -261,9 +277,9 @@ public class SolutionOfFreighting {
                     i, weightOfLorry[i], volumeOfLorry[i], sumOfWeight[i], sumOfVolume[i]);
         }
 
-        System.out.println("\n===>总共需要 <" + needLorryCounts + "> 辆货车，配装结果如下：");
+        System.out.println("\n===>总共装满了 <" + needLorryCounts + "> 辆货车，配装结果如下：");
         System.out.println(gson.toJson(solution));
-        System.out.println("使用矩阵表示为：");
+        System.out.println("\n===>使用矩阵表示为：");
         for (int i = 0; i < countsOfGoods; ++i) {
             for (int j = 0; j < countsOfLorry; ++j) {
                 System.out.print(x[i][j] + "\t");
@@ -274,7 +290,7 @@ public class SolutionOfFreighting {
     }
 
     /**
-     * 计算一个int数组的和
+     * 计算一个数组的和
      *
      * @param array
      * @return
