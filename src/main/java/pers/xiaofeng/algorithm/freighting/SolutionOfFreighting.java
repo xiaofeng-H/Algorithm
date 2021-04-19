@@ -86,8 +86,8 @@ public class SolutionOfFreighting {
                 2.40, 0.87, 1.54, 5.60, 4.40, 1.80, 3.80, 4.00, 5.46, 3.54, 1.60, 2.46, 2.20, 2.80, 3.20, 3.00, 1.20, 1.20,
                 3.89, 1.01, 1.23, 1.00, 3.20, 0.80, 1.10,};
         //System.out.println(g.length + "|" + v.length);
-        double[] G = {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6};
-        double[] V = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10};
+        double[] G = {6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6, 6};
+        double[] V = {10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10, 10};
         SolutionOfFreighting solutionOfFreighting = new SolutionOfFreighting(g, v, G, V);
         solutionOfFreighting.calculate();
     }
@@ -156,18 +156,33 @@ public class SolutionOfFreighting {
             listTmp.add(k);
         }
 
+        int[] b = new int[b1.length];
+        b = b1;
 
         // 假设现有的所有货车可以装下所有的货物
         for (int j = 0; j < countsOfLorry; j++) {   // j表示货车的次序
 
-            // 记录当前车辆已经配装了几件货物
+            /*// 记录当前车辆已经配装了几件货物
             int count = 0;
 
             // b表示当前还未装载的货物
             int[] b = new int[listTmp.size()];
             for (int i = 0; i < listTmp.size(); i++) {
                 b[i] = listTmp.get(i);
+            }*/
+
+            // 删除b中已被标记为删除的元素
+            List<Integer> list = new ArrayList<>();
+            for (int i = 0; i < b.length; i++) {
+                if (b[i] != -1) {
+                    list.add(b[i]);
+                }
             }
+            b = new int[list.size()];
+            for (int i = 0; i < list.size(); i++) {
+                b[i] = list.get(i);
+            }
+
             // 如果货物已经装完，则直接退出循环
             if (b.length == 0) {
                 System.out.println("货物已全部装完！！！\n");
@@ -177,6 +192,7 @@ public class SolutionOfFreighting {
 
             for (int i = 0; i < b.length; i++) {   // i表示是哪个货物
 
+                /*// 按容重比顺利配装
                 if ((sumOfWeight[j] + weightOfGoods[b[i]]) <= weightOfLorry[j] && (sumOfVolume[j] + volumeOfGoods[b[i]]) <= volumeOfLorry[j]) {
                     System.out.println("正在装" + b[i] + "号货物");
                     // 将i号货物的重量和体积累加到j号货车
@@ -190,10 +206,9 @@ public class SolutionOfFreighting {
                     listTmp.remove(i - count);
                     // 记录已经配装货物的数量，因为删除货物是下标问题
                     ++count;
-                }
+                }*/
 
-
-                /*if (i % 2 == 0) {
+                if (i % 2 == 0) {
                     if ((sumOfWeight[j] + weightOfGoods[b[i / 2]]) <= weightOfLorry[j] && (sumOfVolume[j] + volumeOfGoods[b[i / 2]]) <= volumeOfLorry[j]) {
                         System.out.println("正在装" + b[i / 2] + "号货物");
                         // 将i号货物的重量和体积累加到j号货车
@@ -203,8 +218,8 @@ public class SolutionOfFreighting {
                         solution[b[i / 2]] = j;
                         // 记录数组x x[i][j] = 1 表示i号货物装入j号车
                         x[b[i / 2]][j] = 1;
-                        // 在当前还未装载的货物中移除第i号货物
-                        listTmp.remove(0);
+                        // 在当前还未装载的货物中移除已装载的货物（用标记为-1表示）
+                        b[i / 2] = -1;
                     }
                 } else {
                     if ((sumOfWeight[j] + weightOfGoods[b[b.length - 1 - (i / 2)]]) <= weightOfLorry[j] && (sumOfVolume[j] + volumeOfGoods[b[b.length - 1 - (i / 2)]] <= volumeOfLorry[j])) {
@@ -216,15 +231,10 @@ public class SolutionOfFreighting {
                         solution[b[b.length - 1 - (i / 2)]] = j;
                         // 记录数组x x[i][j] = 1 表示i号货物装入j号车
                         x[b[b.length - 1 - (i / 2)]][j] = 1;
-                        // 在当前还未装载的货物中移除第N - 1 - i号货物
-                        listTmp.remove(listTmp.size() - 1);
+                        // 在当前还未装载的货物中移除已装载的货物（用标记为-1表示）
+                        b[b.length - 1 - (i / 2)] = -1;
                     }
-                }*/
-
-                /*// 表示第j号车已经装满，开始装下一辆车
-                if (sumOfWeight[j] > G[j] || sumOfVolume[j] > V[j]) {
-                    break;
-                }*/
+                }
             }
             // 所需车辆数+1
             needLorryCounts += 1;
@@ -235,8 +245,8 @@ public class SolutionOfFreighting {
         // 所有货车装载的货物体积总和
         double volumeSumOfLorry = sumOfArrays(sumOfVolume);
 
-        System.out.println("货物累计重量为：" + weightSumOfGoods + " \t| 货车已装载的累计重量为：" + weightSumOfLorry);
-        System.out.println("货物累计体积为：" + volumeSumOfGoods + " \t| 货车已装载的累计体积为：" + volumeSumOfLorry + "\n");
+        System.out.printf("货物累计重量为：%6.3f\t|  货车已装载的累计重量为：%6.3f\n", weightSumOfGoods, weightSumOfLorry);
+        System.out.printf("货物累计体积为：%6.3f\t|  货车已装载的累计体积为：%6.3f\n", volumeSumOfGoods, volumeSumOfLorry);
 
 
     }
