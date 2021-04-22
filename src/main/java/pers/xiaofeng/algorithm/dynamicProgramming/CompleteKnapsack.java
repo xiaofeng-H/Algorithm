@@ -63,7 +63,7 @@ public class CompleteKnapsack {
         }
 
         // 分割线
-        System.out.println("《=====================我是分割线======================》");
+        System.out.println("=====================我是分割线======================");
 
         // 打印路径矩形
         for (int i = 0; i <= n; i++) {
@@ -73,7 +73,7 @@ public class CompleteKnapsack {
             System.out.println();
         }
 
-        System.out.println("《=====================我还是分割线======================》");
+        System.out.println("=====================我还是分割线======================");
 
         int i = path.length - 1;
         int j = path[0].length - 1;
