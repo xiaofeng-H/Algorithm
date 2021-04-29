@@ -2,9 +2,7 @@ package pers.xiaofeng.algorithm.freighting;
 
 import com.google.gson.Gson;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 
 /**
  * @className: pers.xiaofeng.algorithm.freighting.SolutionOfFreighting
@@ -56,6 +54,7 @@ public class SolutionOfFreighting {
 
     // S[i]=j 表示第i号货物装在了第j号货车
     private int[] solution;
+    private Map<Integer, List> solutionMap;
 
     // 所需货车数量
     private int needLorryCounts;
@@ -76,6 +75,7 @@ public class SolutionOfFreighting {
         this.countsOfGoods = weightOfGoods.length;
         this.countsOfLorry = weightOfLorry.length;
         this.x = new int[this.countsOfGoods][this.countsOfLorry];
+        this.solutionMap = new HashMap<>();
     }
 
     public static void main(String[] args) {
@@ -289,6 +289,24 @@ public class SolutionOfFreighting {
 
         System.out.println("\n===>总共装满了 <" + needLorryCounts + "> 辆货车，配装结果如下：");
         System.out.println(gson.toJson(solution));
+
+        for (int i = 0; i < solution.length; i++) {
+            if (solutionMap.containsKey(solution[i])) {
+                solutionMap.get(solution[i]).add(i);
+            } else {
+                ArrayList<Integer> list = new ArrayList<>();
+                list.add(i);
+                solutionMap.put(solution[i], list);
+            }
+        }
+        for (Map.Entry<Integer, List> entry : solutionMap.entrySet()) {
+            System.out.printf("货车编号 %2d 配装的货物编号为：", entry.getKey());
+            for (Object o : entry.getValue()) {
+                System.out.printf("%d ", o);
+            }
+            System.out.println();
+        }
+
         System.out.println("\n===>使用矩阵表示为：");
         for (int i = 0; i < countsOfGoods; ++i) {
             for (int j = 0; j < countsOfLorry; ++j) {
